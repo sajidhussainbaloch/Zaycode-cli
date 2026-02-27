@@ -1,0 +1,24 @@
+To install globally, just run this from the project folder:
+
+powershell
+cd c:\Users\Musab\Desktop\ai-router-cli
+npm install -g .
+After that, you can run zaycode from anywhere — any folder, any terminal.
+
+If you transfer the files to another machine, the steps are:
+
+Copy the entire ai-router-cli folder (but you can skip node_modules/)
+On the new machine, open the folder and run:
+powershell
+npm install
+npm install -g .
+Make sure the 
+
+.env
+ file has your OPENROUTER_API_KEY:
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+Then just type zaycode from anywhere
+To uninstall later:
+
+powershell
+npm uninstall -g zaycode

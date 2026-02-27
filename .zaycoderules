@@ -1,0 +1,4 @@
+- Prefer functional and declarative programming patterns; avoid using classes.
+- Use early returns to minimize nesting in conditional logic.
+- Ensure all exported functions have descriptive JSDoc comments.
+- Use dash-case for all new directory names.

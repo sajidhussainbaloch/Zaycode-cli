@@ -1,0 +1,34 @@
+{
+  "name": "zaycode",
+  "version": "6.8.0",
+  "description": "ZayCode — Autonomous AI Developer CLI",
+  "main": "index.js",
+  "bin": {
+    "zaycode": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --check index.js && node --check core/state.js && node --check core/memory.js && echo All modules OK"
+  },
+  "keywords": [
+    "ai",
+    "cli",
+    "developer",
+    "autonomous",
+    "coding",
+    "agent"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-highlight": "^2.1.11",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "marked": "^17.0.3"
+  }
+}

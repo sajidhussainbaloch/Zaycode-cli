@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZayCode Mastermind | Visual Thought Dashboard</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --panel: #141417;
+            --accent: #00f2ff;
+            --text: #e0e0e6;
+            --dim: #888891;
+            --border: #27272a;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        aside {
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        main {
+            padding: 20px;
+            overflow-y: auto;
+            background: radial-gradient(circle at 50% 0%, #1e1e2e 0%, var(--bg) 70%);
+            display: none;
+        }
+
+        main.active {
+            display: block;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--dim);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+        }
+
+        .mcp-form {
+            background: var(--panel);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--dim);
+            margin-bottom: 8px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        button {
+            background: var(--accent);
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .server-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .server-status {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(0, 200, 0, 0.2);
+            color: #00ff00;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-badge {
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid var(--accent);
+        }
+
+        .thought-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            animation: slideUp 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .thought-type {
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .thought-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #stream {
+            display: flex;
+            flex-direction: column-reverse;
+        }
+    </style>
+</head>
+
+<body>
+    <aside>
+        <div class="header">
+            <span>ZayCode</span>
+        </div>
+        <div id="status" class="status-badge">REPL ACTIVE</div>
+
+        <div style="margin-top: 20px;">
+            <div data-tab="stream-tab" class="nav-item active">Thought Stream</div>
+            <div data-tab="mcp-tab" class="nav-item">MCP Manager</div>
+        </div>
+
+        <div style="margin-top: auto; color: var(--dim); font-size: 0.8rem;">
+            v8.5 Mastermind Dashboard
+        </div>
+    </aside>
+
+    <main id="stream-tab" class="active">
+        <div id="stream">
+            <!-- Thoughts will stream here -->
+        </div>
+    </main>
+
+    <main id="mcp-tab">
+        <h2 style="margin-top: 0;">Modular Tool Servers (MCP)</h2>
+
+        <div class="mcp-form" style="background: rgba(0, 242, 255, 0.03); border-color: rgba(0, 242, 255, 0.2);">
+            <div class="input-group">
+                <label>🚀 Smart Import (Paste Cursor Link or JSON Reference)</label>
+                <textarea id="mcp-import" rows="2" placeholder="Paste cursor://... or { 'mcpServers': ... }"
+                    oninput="smartParse()"></textarea>
+            </div>
+        </div>
+
+        <div class="mcp-form">
+            <div class="input-group">
+                <label>Transport Type</label>
+                <select id="mcp-type" onchange="toggleMcpType()">
+                    <option value="stdio">Local (STDIO)</option>
+                    <option value="http">Remote (HTTP/SHTTP)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Server Name</label>
+                <input type="text" id="mcp-name" placeholder="e.g. google-search">
+            </div>
+
+            <!-- STDIO Fields -->
+            <div id="mcp-stdio-fields">
+                <div class="input-group">
+                    <label>Command (npx, node, etc.)</label>
+                    <input type="text" id="mcp-command" placeholder="npx">
+                </div>
+                <div class="input-group">
+                    <label>Arguments (JSON Array)</label>
+                    <textarea id="mcp-args" rows="3"
+                        placeholder='["-y", "@modelcontextprotocol/server-memory"]'></textarea>
+                </div>
+            </div>
+
+            <!-- HTTP Fields -->
+            <div id="mcp-http-fields" style="display: none;">
+                <div class="input-group">
+                    <label>Server URL (HTTP/SHTTP)</label>
+                    <input type="text" id="mcp-url" placeholder="https://mcp.brightdata.com/mcp?token=...">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Environment Variables (JSON Object)</label>
+                <textarea id="mcp-env" rows="3" placeholder='{ "API_KEY": "..." }'></textarea>
+            </div>
+            <button onclick="addMCPServer()">Connect & Save Server</button>
+        </div>
+
+        <div id="mcp-list" class="server-grid">
+            <!-- Servers will appear here -->
+        </div>
+    </main>
+
+    <script>
+        const streamContainer = document.getElementById('stream');
+        const statusEl = document.getElementById('status');
+        let currentResponseCard = null;
+        let currentResponseContent = null;
+
+        const eventSource = new EventSource('/api/stream');
+
+        eventSource.onmessage = (event) => {
+            const payload = JSON.parse(event.data);
+            handleEvent(payload);
+        };
+
+        function handleEvent(payload) {
+            if (payload.type === 'token') {
+                updateStreamingResponse(payload.data);
+                return;
+            }
+
+            // Close current response card on new event
+            currentResponseCard = null;
+            currentResponseContent = null;
+
+            addThought(payload);
+        }
+
+        function updateStreamingResponse(token) {
+            if (!currentResponseCard) {
+                currentResponseCard = document.createElement('div');
+                currentResponseCard.className = 'thought-card';
+                currentResponseCard.style.borderLeft = '4px solid var(--accent)';
+
+                const type = document.createElement('div');
+                type.className = 'thought-type';
+                type.textContent = 'AI RESPONSE';
+
+                currentResponseContent = document.createElement('div');
+                currentResponseContent.className = 'thought-content';
+
+                currentResponseCard.appendChild(type);
+                currentResponseCard.appendChild(currentResponseContent);
+                streamContainer.prepend(currentResponseCard);
+            }
+
+            currentResponseContent.textContent += token;
+            statusEl.textContent = 'STREAMING...';
+        }
+
+        function addThought(payload) {
+            const card = document.createElement('div');
+            card.className = 'thought-card';
+
+            // Style by type
+            if (payload.type === 'error') card.style.borderLeft = '4px solid #ff4444';
+            if (payload.type === 'success') card.style.borderLeft = '4px solid #00c853';
+            if (payload.type === 'warning') card.style.borderLeft = '4px solid #ffd600';
+            if (payload.type === 'tool_start') card.style.borderLeft = '4px solid #aa00ff';
+
+            const type = document.createElement('div');
+            type.className = 'thought-type';
+            type.textContent = payload.type.replace('_', ' ');
+
+            const content = document.createElement('div');
+            content.className = 'thought-content';
+            content.textContent = typeof payload.data === 'string'
+                ? payload.data
+                : JSON.stringify(payload.data, null, 2);
+
+            card.appendChild(type);
+            card.appendChild(content);
+            streamContainer.prepend(card);
+
+            // Update Status Badge
+            if (payload.type === 'thought') statusEl.textContent = 'THINKING...';
+            if (payload.type === 'tool_start') statusEl.textContent = 'EXECUTING TOOL...';
+            if (payload.type === 'idle') statusEl.textContent = 'REPL ACTIVE';
+            if (payload.type === 'info') statusEl.textContent = 'REPL ACTIVE';
+        }
+
+        // v8.5: Tab Switching
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('main').forEach(m => m.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            };
+        });
+
+        // v8.5: MCP Management
+        async function fetchMCPServers() {
+            const res = await fetch('/api/mcp');
+            const servers = await res.json();
+            const list = document.getElementById('mcp-list');
+            list.innerHTML = '';
+
+            servers.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'server-card';
+
+                const isHttp = s.config.type === 'http' || s.config.url;
+                const displayCmd = isHttp
+                    ? `<span style="color:var(--accent)">URL:</span> ${s.config.url}`
+                    : `${s.config.command} ${s.config.args.join(' ')}`;
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">
+                        <span style="font-weight:bold; color:var(--accent)">${s.name}</span>
+                        <span class="server-status">${s.status}</span>
+                    </div>
+                    <div style="font-size:0.8rem; color:var(--dim); font-family:monospace; margin-bottom:12px; word-break:break-all;">
+                        ${displayCmd}
+                    </div>
+                    <button style="padding:4px 8px; font-size:0.7rem; background:#ff4444" onclick="removeMCPServer('${s.name}')">Remove</button>
+                `;
+                list.appendChild(card);
+            });
+        }
+        function toggleMcpType() {
+            const type = document.getElementById('mcp-type').value;
+            const stdio = document.getElementById('mcp-stdio-fields');
+            const http = document.getElementById('mcp-http-fields');
+
+            if (type === 'stdio') {
+                stdio.style.display = 'block';
+                http.style.display = 'none';
+            } else {
+                stdio.style.display = 'none';
+                http.style.display = 'block';
+            }
+        }
+
+        async function addMCPServer() {
+            const type = document.getElementById('mcp-type').value;
+            const name = document.getElementById('mcp-name').value;
+            const envRaw = document.getElementById('mcp-env').value || '{}';
+
+            if (!name) return alert('Server Name is required');
+
+            let config = { type, env: JSON.parse(envRaw) };
+
+            if (type === 'stdio') {
+                const command = document.getElementById('mcp-command').value;
+                const argsRaw = document.getElementById('mcp-args').value || '[]';
+                if (!command) return alert('Command is required for Local transport');
+                config.command = command;
+                config.args = JSON.parse(argsRaw);
+            } else {
+                const url = document.getElementById('mcp-url').value;
+                if (!url) return alert('Server URL is required for Remote transport');
+                config.url = url;
+            }
+
+            try {
+                const res = await fetch('/api/mcp/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, config })
+                });
+
+                if (res.ok) {
+                    alert('Server added successfully!');
+                    fetchMCPServers();
+                    document.getElementById('mcp-import').value = '';
+                }
+            } catch (e) {
+                alert('Invalid JSON in config');
+            }
+        }
+
+        async function removeMCPServer(name) {
+            if (!confirm(`Remove ${name}?`)) return;
+            const res = await fetch(`/api/mcp/${name}`, { method: 'DELETE' });
+            if (res.ok) fetchMCPServers();
+        }
+
+        function smartParse() {
+            const val = document.getElementById('mcp-import').value.trim();
+            if (!val) return;
+
+            // Handle HTTP URLs directly
+            if (val.startsWith('http://') || val.startsWith('https://')) {
+                document.getElementById('mcp-type').value = 'http';
+                toggleMcpType();
+                document.getElementById('mcp-url').value = val;
+                try {
+                    const u = new URL(val);
+                    document.getElementById('mcp-name').value = u.hostname.split('.')[0] || 'remote-server';
+                } catch (e) { }
+                return;
+            }
+
+            // Handle Cursor Deeplinks
+            if (val.startsWith('cursor://')) {
+                try {
+                    const url = new URL(val);
+                    const name = url.searchParams.get('name');
+                    const configB64 = url.searchParams.get('config');
+
+                    if (name) document.getElementById('mcp-name').value = name;
+                    if (configB64) {
+                        const decoded = JSON.parse(atob(configB64));
+                        populateFields(decoded);
+                    }
+                } catch (e) { console.error('Deeplink parse error', e); }
+                return;
+            }
+
+            // Handle JSON strings (could be full config or just part)
+            if (val.startsWith('{')) {
+                try {
+                    let data = JSON.parse(val);
+                    if (data.mcpServers) {
+                        const name = Object.keys(data.mcpServers)[0];
+                        document.getElementById('mcp-name').value = name;
+                        populateFields(data.mcpServers[name]);
+                    } else {
+                        populateFields(data);
+                    }
+                } catch (e) {
+                    // Might be incomplete JSON
+                }
+            }
+        }
+
+        function populateFields(config) {
+            if (!config) return;
+
+            if (config.type === 'http' || config.url) {
+                document.getElementById('mcp-type').value = 'http';
+                document.getElementById('mcp-url').value = config.url || '';
+            } else {
+                document.getElementById('mcp-type').value = 'stdio';
+                if (config.command) {
+                    const parts = config.command.split(' ');
+                    document.getElementById('mcp-command').value = parts[0];
+
+                    let args = config.args || [];
+                    if (parts.length > 1) {
+                        args = [...parts.slice(1), ...args];
+                    }
+                    document.getElementById('mcp-args').value = JSON.stringify(args, null, 2);
+                } else if (config.args) {
+                    document.getElementById('mcp-args').value = JSON.stringify(config.args, null, 2);
+                }
+            }
+
+            toggleMcpType();
+
+            if (config.env) {
+                document.getElementById('mcp-env').value = JSON.stringify(config.env, null, 2);
+            } else {
+                document.getElementById('mcp-env').value = '{}';
+            }
+        }
+
+        // Initial fetch
+        fetch('/api/state')
+            .then(r => r.json())
+            .then(data => {
+                if (data.history) {
+                    data.history.forEach(handleEvent);
+                }
+            });
+
+        fetchMCPServers();
+    </script>
+</body>
+
+</html>
