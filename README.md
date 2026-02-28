@@ -72,3 +72,42 @@ Replace the repository URL above with your actual GitHub repo URL.
 ---
 
 For more details, see the PROMPT_ANALYSIS_REPORT.md and PROMPT_ANALYSIS_V7_REPORT.md files.
+
+---
+
+## Setting Your OpenRouter API Key
+
+Zaycode CLI requires an OpenRouter API key to function. You can provide your API key in one of two ways:
+
+### 1. Using the .env file (recommended for local development)
+
+Create a file named `.env` in the project root and add:
+
+```
+OPENROUTER_API_KEY=your-api-key-here
+```
+
+### 2. Using the global config file (for global installs or multiple projects)
+
+Edit (or create) the config file at:
+`%USERPROFILE%\.zaycode\config.json` (Windows)
+or
+`~/.zaycode/config.json` (Mac/Linux)
+
+Add your API key under the `providers.openrouter.apiKey` field:
+
+```json
+{
+	"providers": {
+		"openrouter": {
+			"apiKey": "your-api-key-here",
+			"baseUrl": "https://openrouter.ai/api/v1/chat/completions"
+		}
+	},
+	...
+}
+```
+
+---
+
+If you do not set your API key, the CLI will not be able to connect to OpenRouter.
